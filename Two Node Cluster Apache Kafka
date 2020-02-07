@@ -1,0 +1,46 @@
+SETTING UP A 2 NODE CLUSTER WITH APACHE KAFKA
+
+1. CREATE 3 VM'S. KAFKA-0, KAFKA-1 & KAFKA-ZOOKEEPER (ALL THREE SHOULD BE RUNNING CENTOS7).
+2. INSTALL JDK ON ALL THE THREE VM'S USING:
+	sudo yum -y install java-1.8.0-openjdk
+3. NOW INSTALL WGET ON ALL THE THREE VM'S
+	sudo yum -y install wget
+4. GET THE LATEST VERSION OF APACHE KAFKA USING:
+	wget http://mirrors.estointernet.in/apache/kafka/2.3.1/kafka_2.11-2.3.1.tgz
+5. UNZIP THE DOWNLOADED FILE:
+	tar -xzf kafka_2.11-2.3.1.tgz 
+6. IF YOU DON'T WANT TO INCLUDE DIRECTORY NAMES ALL THE TIME WHEN RUNNING A KAFKA/ZOOKEEPER COMMAND, ADD THE BIN DIRECTORY TO YOUR PATH    ENVIRONMENT VARIABLE USING:
+	sudo vi .bash_profile
+   INSIDE OF THIS ADD YOUR PATH REQUIRED:
+	(IN THIS CASE: $HOME/bin:$HOME/kafka_2.11-2.3.1/bin )
+7. ADD THAT AS THE SOURCE: source .bash_profile
+8. CONFIGURE ZOOKEEPER: FOR AUTOMATIC ZOOKEEPER SERVER STARTUP:
+	sudo vi /etc/rc.d/rc.local
+	AT THE END ADD : /home/shubhendu/kafka_2.12-2.0.0/bin/zookeeper-server-start.sh /home/shubhendu/kafka_2.12-	2.0.0/config/zookeeper.properties > /dev/null 2>&1 &
+9. GIVE IT EXECUTABLE PERMISSIONS:
+	sudo chmod +x /etc/rc.d/rc.local
+	sudo systemctl enable rc-local
+	sudo systemctl start rc-local
+10. START THE ZOOKEEPER SERVER:
+	zookeeper-server-start.sh kafka_2.11-2.3.1/config/zookeeper.properties 
+11. NOW, LET'S SETUP BOTH THE KAFKA BROKERS:
+	SAME WORKFLOW AS DONE IN ZOOKEEPER:
+		sudo vi .bash_profile
+     		source .bash_profile
+     		sudo vi kafka_2.11-2.3.1/config/server.properties 
+     		sudo vi /etc/rc.d/rc.local
+     		sudo chmod +x /etc/rc.d/rc.local
+     		sudo systemctl enable rc-local
+     		sudo systemctl start rc-local
+12. CREATE A TOPIC:
+	kafka-topics.sh --create --zookeeper 10.160.0.35:2181 --replication-factor 2 --partitions 2 --topic test
+13. START THE PRODUCER:
+	kafka-console-producer.sh --broker-list 10.160.0.33:9092 --topic test
+14. START THE CONSUMER:
+	kafka-console-consumer.sh --bootstrap-server 10.160.0.32:9092 --topic test --from-beginning
+
+
+COMPLETE VIDEO AT: https://www.youtube.com/watch?v=m8aEVx0gCEI
+
+
+
